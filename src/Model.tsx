@@ -7,17 +7,22 @@ export default function Model({ url }: { url: string }) {
 
   return (
     <primitive object={scene}>
-      {hotspots.map((h) => (
-        <Html
-          key={h.id}
-          position={h.position}
-          center
-          distanceFactor={100}
-          className="bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"
-        >
-          {h.text}
-        </Html>
-      ))}
+     {hotspots.map((h) => (
+  <Html
+    key={h.id}
+    position={h.position}
+    center
+    distanceFactor={60} // lowered from 100 so it's visible
+    className="bg-blue-600 text-white 
+               text-[10px] sm:text-xs md:text-sm lg:text-base 
+               px-1.5 sm:px-2 md:px-3 lg:px-4 
+               py-0.5 sm:py-1 md:py-1.5 lg:py-2 
+               rounded shadow"
+  >
+    {h.text}
+  </Html>
+))}
+
     </primitive>
   )
 }
