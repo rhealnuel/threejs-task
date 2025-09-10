@@ -1,15 +1,48 @@
-import { Suspense } from "react"
-import { Canvas } from "@react-three/fiber"
+import { Suspense, useCallback, useEffect } from "react"
+import { Canvas, useThree } from "@react-three/fiber"
 import { Html, OrbitControls, Environment, Bounds } from "@react-three/drei"
+import * as THREE from "three"
 import useStore from "./store"
 import Model from "./Model"
-import Hotspots from "./Hotspots"
+
+function ClickHandler() {
+  const { addHotspot } = useStore()
+  const { camera, scene, gl } = useThree()
+  const raycaster = new THREE.Raycaster()
+  const mouse = new THREE.Vector2()
+
+  const handleClick = useCallback(
+    (event: MouseEvent) => {
+      const rect = gl.domElement.getBoundingClientRect()
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+
+      raycaster.setFromCamera(mouse, camera)
+      const intersects = raycaster.intersectObjects(scene.children, true)
+
+      if (intersects.length > 0) {
+        addHotspot(intersects[0].point.clone())
+      }
+    },
+    [camera, scene, gl, addHotspot]
+  )
+
+  useEffect(() => {
+    gl.domElement.addEventListener("click", handleClick)
+    return () => gl.domElement.removeEventListener("click", handleClick)
+  }, [handleClick, gl.domElement])
+
+  return null
+}
 
 export default function MiniEditor() {
-  const { modelUrl, modelName } = useStore()
+  const { modelUrl } = useStore()
 
   const fallback = (
-    <Html center className="text-sm text-gray-400 bg-gray-800/80 px-3 py-2 rounded w-[200px] h-fit">
+    <Html
+      center
+      className="text-sm text-gray-400 bg-gray-800/80 px-3 py-2 rounded w-[200px] h-fit"
+    >
       Import a .glb file to begin
     </Html>
   )
@@ -23,14 +56,14 @@ export default function MiniEditor() {
       <Suspense fallback={fallback}>
         {modelUrl ? (
           <Bounds fit clip margin={1.2}>
-            <Model url={modelUrl} name={modelName || "Model"} />
+            <Model url={modelUrl} />
           </Bounds>
         ) : (
           fallback
         )}
       </Suspense>
 
-      <Hotspots />
+      {modelUrl && <ClickHandler />}
 
       <OrbitControls enableDamping enablePan />
     </Canvas>

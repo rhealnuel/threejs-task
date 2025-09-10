@@ -60,8 +60,6 @@ const useStore = create<Store>((set) => ({
     set({
       hotspots: [],
       selectedId: null,
-      modelUrl: null,
-      modelName: null,
     }),
 }))
 

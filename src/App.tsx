@@ -44,7 +44,7 @@ export default function App() {
             onClick={clearAll}
             className="rounded-md cursor-pointer bg-gray-700 px-3 py-1.5 text-sm font-medium hover:bg-gray-600"
           >
-            Clear All
+            Clear Hotspots
           </button>
         </div>
       </header>

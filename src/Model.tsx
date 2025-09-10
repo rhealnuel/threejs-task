@@ -1,35 +1,23 @@
-import  { useMemo } from "react"
-import { useLoader } from "@react-three/fiber"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
+import { Html, useGLTF } from "@react-three/drei"
 import useStore from "./store"
 
-interface Props {
-  url: string
-  name?: string
-}
-
-export default function Model({ url, name }: Props) {
-  const gltf = useLoader(GLTFLoader, url)
-  const { addHotspot } = useStore()
-
-  const scene = useMemo(() => {
-    gltf.scene.traverse((o: any) => {
-      if (o.isMesh) {
-        o.castShadow = true
-        o.receiveShadow = true
-      }
-    })
-    return gltf.scene
-  }, [gltf])
-
-  const handleClick = (e: any) => {
-    addHotspot(e.point)
-    e.stopPropagation()
-  }
+export default function Model({ url }: { url: string }) {
+  const { scene } = useGLTF(url)
+  const { hotspots } = useStore()
 
   return (
-    <group name={name || "Model"} onClick={handleClick}>
-      <primitive object={scene} />
-    </group>
+    <primitive object={scene}>
+      {hotspots.map((h) => (
+        <Html
+          key={h.id}
+          position={h.position}
+          center
+          distanceFactor={100}
+          className="bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"
+        >
+          {h.text}
+        </Html>
+      ))}
+    </primitive>
   )
 }
